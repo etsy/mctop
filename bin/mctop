@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+
+# mctop - A command line memcached traffic analyzer
+# 
+# Author:: Marcus Barczak (<marcus@etsy.com>)
+
+$:.unshift File.join(File.dirname(__FILE__),'..','lib')
+
+require 'cmdline'
+require 'sniffer'
+require 'ui'
+
+@config = CmdLine.parse(ARGV)
+
+# instantiate a sniffer and user interface object
+sniffer = MemcacheSniffer.new(@config)
+ui      = UI.new(@config)
+
+# set default display options
+sort_mode  = :reqsec
+sort_order = :desc
+done       = false
+
+# trap most of the typical signals
+%w[ INT QUIT HUP KILL ].each do |sig|
+    Signal.trap(sig) do
+        puts "** Caught signal #{sig} - exiting"
+        done = true
+    end
+end
+
+# kick the sniffer thread off
+sniff_thread = Thread.new { sniffer.start }
+
+# main loop
+until done do
+    ui.header
+    ui.footer
+    ui.render_stats(sniffer, sort_mode, sort_order)
+    refresh
+
+    key = ui.input_handler
+    case key
+        when /[Qq]/
+            done = true
+        when /[Cc]/
+            sort_mode = :calls
+        when /[Ss]/
+            sort_mode = :objsize
+        when /[Rr]/
+            sort_mode = :reqsec
+        when /[Bb]/
+            sort_mode = :bw
+        when /[Tt]/
+            if sort_order == :desc
+                sort_order = :asc
+            else
+                sort_order = :desc
+            end
+    end
+end
+
+## cleanup
+ui.done
+sniffer.done
+
+## if sniffer thread doesn't join immediately kill it off the
+## capture.each loop blocks if no packets have been seen
+if sniff_thread.join(0)
+    sniff_thread.kill
+end
