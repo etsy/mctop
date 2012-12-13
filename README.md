@@ -1,5 +1,6 @@
 # mctop
 
+
 Inspired by "top", mctop passively sniffs the network traffic passing in and out of a
 server's network interface and tracks the keys responding to memcache get commands. The output
 is presented on the terminal and allows sorting by total calls, requests/sec and
@@ -11,6 +12,8 @@ You can read more detail about why this tool evovled over on our
 mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if you don't have 
 this installed you'll need to ensure you have the development pcap libraries (libpcap-devel 
 package on most linux distros) to build the native gem.
+
+![](http://etsycodeascraft.files.wordpress.com/2012/12/mctop.jpg)
 
 ## How it works
 
