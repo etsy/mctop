@@ -10,6 +10,10 @@ class CmdLine
                 @config[:nic] = nic
             end
 
+            opt.on('-p', '--port=PORT', 'Network port to sniff on (default 11211)') do |port|
+                @config[:port] = port
+            end
+
             @config[:discard_thresh] = 0
             opt.on '-d', '--discard=THRESH', Float, 'Discard keys with request/sec rate below THRESH' do |discard_thresh|
                 @config[:discard_thresh] = discard_thresh
@@ -20,7 +24,7 @@ class CmdLine
                 @config[:refresh_rate] = refresh_rate
             end
 
-            opt.on_tail '-h', '--help', 'Show usage info' do 
+            opt.on_tail '-h', '--help', 'Show usage info' do
                 puts opts
                 exit
             end

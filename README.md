@@ -9,8 +9,8 @@ bandwidth.
 You can read more detail about why this tool evovled over on our
 [code as craft](http://codeascraft.etsy.com/2012/12/13/mctop-a-tool-for-analyzing-memcache-get-traffic) blog.
 
-mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if you don't have 
-this installed you'll need to ensure you have the development pcap libraries (libpcap-devel 
+mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if you don't have
+this installed you'll need to ensure you have the development pcap libraries (libpcap-devel
 package on most linux distros) to build the native gem.
 
 ![](http://etsycodeascraft.files.wordpress.com/2012/12/mctop.jpg)
@@ -20,7 +20,7 @@ package on most linux distros) to build the native gem.
 mctop sniffs network traffic collecting memcache `VALUE` responses and calculates from
 traffic statistics for each key seen.  It currently reports on the following metrics per key:
 
-* **calls** - the number of times the key has been called since mctop started 
+* **calls** - the number of times the key has been called since mctop started
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
 * **bw (kbps)** - the estimated netowrk bandwidth consumed by this key in kilobits-per-second
@@ -40,6 +40,7 @@ the quickest way to get it running is to:
 
     Usage: mctop [options]
         -i, --interface=NIC              Network interface to sniff (required)
+        -p, --port=PORT                  Network port to sniff on (default 11211)
         -d, --discard=THRESH             Discard keys with request/sec rate below THRESH
         -r, --refresh=MS                 Refresh the stats display every MS milliseconds
         -h, --help                       Show usage info
@@ -67,5 +68,5 @@ The following details are displayed in the status bar
 ## Known issues / Gotchas
 
 ### ruby-pcap drops packets at high volume
-from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet 
+from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet
 
