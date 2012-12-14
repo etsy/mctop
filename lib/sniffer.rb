@@ -1,10 +1,11 @@
 require 'pcap'
 
-class MemcacheSniffer 
+class MemcacheSniffer
     attr_accessor :metrics, :semaphore
 
     def initialize(config)
         @source    = config[:nic]
+        @port      = config.has_key?(:port) ? config[:port] : 11211
 
         @metrics = {}
         @metrics[:calls]   = {}
@@ -18,12 +19,12 @@ class MemcacheSniffer
 
     def start
         cap = Pcap::Capture.open_live(@source, 1500)
-        
+
         @metrics[:start_time] = Time.new.to_f
 
         @done      = false
 
-        cap.setfilter('port 11211')
+        cap.setfilter("port #{@port}")
         cap.loop do |packet|
             @metrics[:stats] = cap.stats
 
