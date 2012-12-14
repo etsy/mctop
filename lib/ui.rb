@@ -4,12 +4,14 @@ include Curses
 
 class UI
     def initialize(config)
+	@config = config
+
         init_screen
         cbreak
         curs_set(0)
 
         # set keyboard input timeout - sneaky way to manage refresh rate
-        Curses.timeout = config.has_key?(:refresh_rate) ? config[:refresh_rate] : 500
+        Curses.timeout = @config[:refresh_rate]
 
         if can_change_color?
             start_color
@@ -21,9 +23,6 @@ class UI
         @stat_cols      = %w[ calls objsize req/sec bw(kbps) ]
         @stat_col_width = 10 
         @key_col_width  = 0
-
-        # we will delete any keys from the metrics table whose req/sec rate is below discard_rate
-        @discard_thresh = config.has_key?(:discard_thresh) ? config[:discard_thresh] : 0
 
         @commands = {
             'Q' => "quit",
@@ -95,7 +94,7 @@ class UI
                     # if req/sec is <= the discard threshold delete those keys from
                     # the metrics hash - this is a hack to manage the size of the
                     # metrics hash in high volume environments
-                    if reqsec <= @discard_thresh 
+                    if reqsec <= @config[:discard_thresh]
                         sniffer.metrics[:calls].delete(k)
                         sniffer.metrics[:objsize].delete(k)
                         sniffer.metrics[:reqsec].delete(k)
@@ -151,7 +150,20 @@ class UI
     end
 
     def input_handler
-        getch
+        # Curses.getch has a bug in 1.8.x causing non-blocking
+        # calls to block reimplemented using IO.select
+        if RUBY_VERSION =~ /^1.8/
+	     refresh_secs = @config[:refresh_rate].to_f / 1000 
+
+            if IO.select([STDIN], nil, nil, refresh_secs)
+                c = getch
+                c.chr
+            else
+                nil
+            end
+        else
+            getch
+        end
     end
 
     def done
