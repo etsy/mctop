@@ -1,4 +1,5 @@
 require 'pcap'
+require 'thread'
 
 class MemcacheSniffer 
     attr_accessor :metrics, :semaphore
