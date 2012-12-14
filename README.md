@@ -6,7 +6,7 @@ server's network interface and tracks the keys responding to memcache get comman
 is presented on the terminal and allows sorting by total calls, requests/sec and
 bandwidth.
 
-You can read more detail about why this tool evovled over on our
+You can read more detail about why this tool evolved over on our
 [code as craft](http://codeascraft.etsy.com/2012/12/13/mctop-a-tool-for-analyzing-memcache-get-traffic) blog.
 
 mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if you don't have 
@@ -17,13 +17,13 @@ package on most linux distros) to build the native gem.
 
 ## How it works
 
-mctop sniffs network traffic collecting memcache `VALUE` responses and calculates from
+mctop sniffs network traffic collecting memcache `VALUE` responses and calculates
 traffic statistics for each key seen.  It currently reports on the following metrics per key:
 
 * **calls** - the number of times the key has been called since mctop started 
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
-* **bw (kbps)** - the estimated netowrk bandwidth consumed by this key in kilobits-per-second
+* **bw (kbps)** - the estimated network bandwidth consumed by this key in kilobits-per-second
 
 ## Getting it running
 
@@ -67,5 +67,6 @@ The following details are displayed in the status bar
 ## Known issues / Gotchas
 
 ### ruby-pcap drops packets at high volume
-from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet 
+From my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance). 
+You can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet loss on your machine.
 
