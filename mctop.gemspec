@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "mctop"
-  gem.version       = "0.0.3"
+  gem.version       = "0.0.4"
   gem.authors       = ["Marcus Barczak"]
   gem.email         = ["marcus@etsy.com"]
   gem.description   = %q{mctop - a realtime memcache key analyzer}

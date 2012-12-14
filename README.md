@@ -1,6 +1,5 @@
 # mctop
 
-
 Inspired by "top", mctop passively sniffs the network traffic passing in and out of a
 server's network interface and tracks the keys responding to memcache get commands. The output
 is presented on the terminal and allows sorting by total calls, requests/sec and
@@ -64,6 +63,10 @@ The following details are displayed in the status bar
 * `keys` - total number of keys in the metrics table
 * `packets` - packets received and dropped by libpcap (% is percentage of packets dropped)
 * `rt` - the time taken to sort and render the stats
+
+## Changelog
+
+* 2012-12-14 - Now compatible with Ruby 1.8.x (tested on 1.8.7-p371)
 
 ## Known issues / Gotchas
 
