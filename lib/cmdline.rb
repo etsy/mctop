@@ -10,6 +10,7 @@ class CmdLine
                 @config[:nic] = nic
             end
 
+            @config[:port] = 11211
             opt.on('-p', '--port=PORT', 'Network port to sniff on (default 11211)') do |port|
                 @config[:port] = port
             end

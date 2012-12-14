@@ -6,7 +6,7 @@ class MemcacheSniffer
 
     def initialize(config)
         @source    = config[:nic]
-        @port      = config.has_key?(:port) ? config[:port] : 11211
+        @port      = config[:port]
 
         @metrics = {}
         @metrics[:calls]   = {}
