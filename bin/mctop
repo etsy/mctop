@@ -6,6 +6,7 @@
 
 $:.unshift File.join(File.dirname(__FILE__),'..','lib')
 
+require 'rubygems'
 require 'cmdline'
 require 'sniffer'
 require 'ui'
