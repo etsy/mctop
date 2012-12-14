@@ -63,7 +63,7 @@ class UI
 
         # calculate packet loss ratio
         if sniffer.metrics[:stats][:recv] > 0
-            loss = (sniffer.metrics[:stats][:drop].to_f / sniffer.metrics[:stats][:recv].to_f) * 100
+            loss = sprintf("%5.2f", (sniffer.metrics[:stats][:drop].to_f / sniffer.metrics[:stats][:recv].to_f) * 100)
         else
             loss = 0
         end
@@ -74,7 +74,7 @@ class UI
         header_summary = sprintf "%-28s %-14s %-30s", 
             "sort mode: #{sort_mode.to_s} (#{sort_order.to_s})",
             "keys: #{sniffer.metrics[:calls].keys.count}",
-            "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss.round(2)}%)" 
+            "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss}%)" 
         addstr(sprintf "%-#{cols}s", header_summary)
 
         # reset colours for main key display
