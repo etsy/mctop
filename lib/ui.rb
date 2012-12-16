@@ -127,13 +127,9 @@ class UI
                     display_key = k
                 end
 
-                if sniffer.metrics[:server_calls][k].nil?
-                  sniffer.metrics[:server_calls][k] = 0
-                end
-
-                if sniffer.metrics[:client_calls][k].nil?
-                  sniffer.metrics[:client_calls][k] = 0
-                end
+                # Set default values for these if they're not currently set
+                sniffer.metrics[:server_calls][k] = 0 if sniffer.metrics[:server_calls][k].nil?
+                sniffer.metrics[:client_calls][k] = 0 if sniffer.metrics[:client_calls][k].nil?
            
                 # render each key
                 line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.2f %9.2f",
