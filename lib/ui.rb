@@ -27,6 +27,8 @@ class UI
         @commands = {
             'Q' => "quit",
             'C' => "sort by calls",
+            'E' => "sort by server calls",
+            'L' => "sort by client calls",
             'S' => "sort by size",
             'R' => "sort by req/sec",
             'B' => "sort by bandwidth",
