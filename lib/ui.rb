@@ -20,8 +20,8 @@ class UI
             init_pair(2, COLOR_WHITE, COLOR_RED)
         end
 
-        @stat_cols      = %w[ calls objsize req/sec bw(kbps) ]
-        @stat_col_width = 10 
+        @stat_cols      = %w[ calls server client objsize req/sec bw(kbps) ]
+        @stat_col_width = 10
         @key_col_width  = 0
 
         @commands = {
@@ -124,11 +124,21 @@ class UI
                 else
                     display_key = k
                 end
+
+                if sniffer.metrics[:server_calls][k].nil?
+                  sniffer.metrics[:server_calls][k] = 0
+                end
+
+                if sniffer.metrics[:client_calls][k].nil?
+                  sniffer.metrics[:client_calls][k] = 0
+                end
            
                 # render each key
-                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.2f %9.2f",
+                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.2f %9.2f",
                                  display_key,
                                  sniffer.metrics[:calls][k],
+                                 sniffer.metrics[:server_calls][k],
+                                 sniffer.metrics[:client_calls][k],
                                  sniffer.metrics[:objsize][k],
                                  sniffer.metrics[:reqsec][k],
                                  sniffer.metrics[:bw][k]
