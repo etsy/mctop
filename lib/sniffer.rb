@@ -1,17 +1,15 @@
 require 'pcap'
 require 'thread'
-require 'socket'
 
 class MemcacheSniffer
     attr_accessor :metrics, :semaphore
 
     def initialize(config)
-        @source    = config[:nic]
-        @port      = config[:port]
+        @source         = config[:nic]
+        @port           = config[:port]
         @detailed_calls = config[:detailed_calls]
+        @ip             = config[:ip_address]
 
-        # uses default interface, figure out how to get the specific interface's ip
-	@ip	   = IPSocket.getaddress(Socket.gethostname)
 
         @metrics = {}
         @metrics[:calls]          = {}

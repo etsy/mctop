@@ -49,6 +49,7 @@ the quickest way to get it running is to:
         -d, --discard=THRESH             Discard keys with request/sec rate below THRESH
         -r, --refresh=MS                 Refresh the stats display every MS milliseconds
         -c, --detailed-calls             Detailed client/server call stats
+        -a, --ip-address=1.1.1.1         IP address of memcached instance (used for client/server stats)
         -h, --help                       Show usage info
 
 ## User interface commands
