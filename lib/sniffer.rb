@@ -8,6 +8,7 @@ class MemcacheSniffer
     def initialize(config)
         @source    = config[:nic]
         @port      = config[:port]
+        @detailed_calls = config[:detailed_calls]
 
         # uses default interface, figure out how to get the specific interface's ip
 	@ip	   = IPSocket.getaddress(Socket.gethostname)
@@ -41,29 +42,31 @@ class MemcacheSniffer
                 bytes = $2
 
                 @semaphore.synchronize do
-                  if @metrics[:calls].has_key?(key)
-                      @metrics[:calls][key] += 1
-                  else
-                      @metrics[:calls][key] = 1
-                  end
-                  @metrics[:objsize][key] = bytes.to_i
-
-                  # Break down keys by server requests and client requests
-                  if @ip == packet.src.to_s
-                    if @metrics[:server_calls].has_key?(key)
-                        @metrics[:server_calls][key] += 1
+                    if @metrics[:calls].has_key?(key)
+                        @metrics[:calls][key] += 1
                     else
-                        @metrics[:server_calls][key] = 1
+                        @metrics[:calls][key] = 1
                     end
-                  elsif @ip == packet.dst.to_s
-                    if @metrics[:client_calls].has_key?(key)
-                        @metrics[:client_calls][key] += 1
-                    else
-                        @metrics[:client_calls][key] = 1
-                    end
+                    @metrics[:objsize][key] = bytes.to_i
+
+                  if @detailed_calls
+                      # Break down keys by server requests and client requests
+                      if @ip == packet.src.to_s
+                          if @metrics[:server_calls].has_key?(key)
+                              @metrics[:server_calls][key] += 1
+                          else
+                              @metrics[:server_calls][key] = 1
+                          end
+                      end
+
+                      if @ip == packet.dst.to_s
+                          if @metrics[:client_calls].has_key?(key)
+                              @metrics[:client_calls][key] += 1
+                          else
+                              @metrics[:client_calls][key] = 1
+                          end
+                      end
                   end
-
-
                 end
             end
 
