@@ -1,5 +1,6 @@
 require 'optparse'
 require 'pcap'
+require 'socket'
 
 class CmdLine
     def self.parse(args)
@@ -16,18 +17,23 @@ class CmdLine
             end
 
             @config[:discard_thresh] = 0
-            opt.on '-d', '--discard=THRESH', Float, 'Discard keys with request/sec rate below THRESH' do |discard_thresh|
+            opt.on('-d', '--discard=THRESH', Float, 'Discard keys with request/sec rate below THRESH') do |discard_thresh|
                 @config[:discard_thresh] = discard_thresh
             end
 
             @config[:refresh_rate] = 500
-            opt.on '-r', '--refresh=MS', Float, 'Refresh the stats display every MS milliseconds' do |refresh_rate|
+            opt.on('-r', '--refresh=MS', Float, 'Refresh the stats display every MS milliseconds') do |refresh_rate|
                 @config[:refresh_rate] = refresh_rate
             end
 
             @config[:detailed_calls] = false
-            opt.on '-c', '--detailed-calls', 'Detailed client/server call stats' do |detailed_calls|
+            opt.on('-c', '--detailed-calls', 'Detailed client/server call stats') do |detailed_calls|
                 @config[:detailed_calls] = true
+            end
+
+            @config[:ip_address] = IPSocket.getaddress(Socket.gethostname)
+            opt.on('-a', '--ip-address=1.1.1.1', 'IP address of memcached instance (used for client/server stats)') do |ip_address|
+                @config[:ip_address] = ip_address
             end
 
             opt.on_tail '-h', '--help', 'Show usage info' do
