@@ -24,6 +24,12 @@ traffic statistics for each key seen.  It currently reports on the following met
 * **req/sec** - the number of requests per second for the key
 * **bw (kbps)** - the estimated netowrk bandwidth consumed by this key in kilobits-per-second
 
+Optional metrics:
+  When used with the -c or --detailed-calls flag
+  * **server calls** - the number of times the key has been requested from the local memcached server since mctop started
+  * **client calls** - the number of times the key has been requested from this server to an external memcached server since mctop started
+
+
 ## Getting it running
 
 the quickest way to get it running is to:
@@ -42,6 +48,7 @@ the quickest way to get it running is to:
         -p, --port=PORT                  Network port to sniff on (default 11211)
         -d, --discard=THRESH             Discard keys with request/sec rate below THRESH
         -r, --refresh=MS                 Refresh the stats display every MS milliseconds
+        -c, --detailed-calls             Detailed client/server call stats
         -h, --help                       Show usage info
 
 ## User interface commands
@@ -49,6 +56,8 @@ the quickest way to get it running is to:
 The following key commands are available in the console UI:
 
 * `C` - sort by number of calls
+* `E` - sort by number of server calls
+* `L` - sort by number of client calls
 * `S` - sort by object size
 * `R` - sort by requests/sec
 * `B` - sort by bandwidth
