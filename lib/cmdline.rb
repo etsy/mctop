@@ -25,6 +25,11 @@ class CmdLine
                 @config[:refresh_rate] = refresh_rate
             end
 
+            @config[:detailed_calls] = false
+            opt.on '-c', '--detailed-calls', 'Detailed client/server call stats' do |detailed_calls|
+                @config[:detailed_calls] = true
+            end
+
             opt.on_tail '-h', '--help', 'Show usage info' do
                 puts opts
                 exit

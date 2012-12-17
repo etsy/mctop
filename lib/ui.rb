@@ -20,20 +20,33 @@ class UI
             init_pair(2, COLOR_WHITE, COLOR_RED)
         end
 
-        @stat_cols      = %w[ calls server client objsize req/sec bw(kbps) ]
+        if @config[:detailed_calls]
+            @stat_cols = %w[ calls server client objsize req/sec bw(kbps) ]
+        else
+            @stat_cols = %w[ calls objsize req/sec bw(kbps) ]
+        end
+
         @stat_col_width = 10
         @key_col_width  = 0
 
         @commands = {
             'Q' => "quit",
-            'C' => "sort by calls",
-            'E' => "sort by server calls",
-            'L' => "sort by client calls",
+            'C' => "sort by calls"
+        }
+
+        if @config[:detailed_calls]
+            @commands.merge!({
+                'E' => "sort by server calls",
+                'L' => "sort by client calls"
+            })
+        end
+
+        @commands.merge!({
             'S' => "sort by size",
             'R' => "sort by req/sec",
             'B' => "sort by bandwidth",
             'T' => "toggle sort order (asc|desc)"
-        }
+        })
     end
 
     def header
@@ -127,23 +140,30 @@ class UI
                     display_key = k
                 end
 
-                if sniffer.metrics[:server_calls][k].nil?
-                  sniffer.metrics[:server_calls][k] = 0
-                end
-
-                if sniffer.metrics[:client_calls][k].nil?
-                  sniffer.metrics[:client_calls][k] = 0
-                end
+                if @config[:detailed_calls]
+                    # Set default values for these if they're not currently set
+                    sniffer.metrics[:server_calls][k] = 0 if sniffer.metrics[:server_calls][k].nil?
+                    sniffer.metrics[:client_calls][k] = 0 if sniffer.metrics[:client_calls][k].nil?
            
-                # render each key
-                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.2f %9.2f",
-                                 display_key,
-                                 sniffer.metrics[:calls][k],
-                                 sniffer.metrics[:server_calls][k],
-                                 sniffer.metrics[:client_calls][k],
-                                 sniffer.metrics[:objsize][k],
-                                 sniffer.metrics[:reqsec][k],
-                                 sniffer.metrics[:bw][k]
+                    # render each key
+                    line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.2f %9.2f",
+                                     display_key,
+                                     sniffer.metrics[:calls][k],
+                                     sniffer.metrics[:server_calls][k],
+                                     sniffer.metrics[:client_calls][k],
+                                     sniffer.metrics[:objsize][k],
+                                     sniffer.metrics[:reqsec][k],
+                                     sniffer.metrics[:bw][k]
+                else
+                    # render each key
+                    line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.2f %9.2f",
+                                     display_key,
+                                     sniffer.metrics[:calls][k],
+                                     sniffer.metrics[:objsize][k],
+                                     sniffer.metrics[:reqsec][k],
+                                     sniffer.metrics[:bw][k]
+               end
+
             else
                 # we're not clearing the display between renders so erase past
                 # keys with blank lines if there's < maxlines of results
