@@ -22,7 +22,7 @@ traffic statistics for each key seen.  It currently reports on the following met
 * **calls** - the number of times the key has been called since mctop started
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
-* **bw (kbps)** - the estimated netowrk bandwidth consumed by this key in kilobits-per-second
+* **bw (kbps)** - the estimated network bandwidth consumed by this key in kilobits-per-second
 
 ## Getting it running
 
