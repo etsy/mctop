@@ -1,6 +1,7 @@
 require 'pcap'
 require 'thread'
 
+
 class MemcacheSniffer
     attr_accessor :metrics, :semaphore
 
@@ -9,6 +10,7 @@ class MemcacheSniffer
         @port      = config[:port]
 
         @metrics = {}
+        @metrics[:gets]   = {}
         @metrics[:calls]   = {}
         @metrics[:objsize] = {}
         @metrics[:reqsec]  = {}
@@ -28,20 +30,33 @@ class MemcacheSniffer
         cap.setfilter("port #{@port}")
         cap.loop do |packet|
             @metrics[:stats] = cap.stats
-
+		
             # parse key name, and size from VALUE responses
             if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
                 key   = $1
                 bytes = $2
 
                 @semaphore.synchronize do
+                    if @metrics[:gets].has_key?(key)
+                        @metrics[:gets][key] += 1
+                    else
+                        @metrics[:gets][key] = 1
+                    end
+
+                    @metrics[:objsize][key] = bytes.to_i
+                end
+            end
+
+	# parse key name, and size from VALUE responses
+            if packet.raw_data =~ /get (\S+)/
+                key   = $1
+                @semaphore.synchronize do
                     if @metrics[:calls].has_key?(key)
                         @metrics[:calls][key] += 1
                     else
                         @metrics[:calls][key] = 1
                     end
-
-                    @metrics[:objsize][key] = bytes.to_i
+		    @metrics[:objsize][key] = 0;
                 end
             end
 
