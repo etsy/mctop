@@ -20,14 +20,18 @@ class UI
             init_pair(2, COLOR_WHITE, COLOR_RED)
         end
 
-        @stat_cols      = %w[ gethits calls objsize req/sec bw(kbps) ]
+        @stat_cols      = %w[ deletes sets gets hits calls objsize req/sec bw(kbps) ]
         @stat_col_width = 10 
         @key_col_width  = 0
 
         @commands = {
             'Q' => "quit",
+            'C' => "sort by deletes",
+            'S' => "sort by sets",
+            'G' => "sort by gets",
+            'H' => "sort by hits",
             'C' => "sort by calls",
-            'S' => "sort by size",
+            'O' => "sort by size",
             'R' => "sort by req/sec",
             'B' => "sort by bandwidth",
             'T' => "toggle sort order (asc|desc)"
@@ -95,7 +99,10 @@ class UI
                     # the metrics hash - this is a hack to manage the size of the
                     # metrics hash in high volume environments
                     if reqsec <= @config[:discard_thresh]
+                        sniffer.metrics[:sets].delete(k)
+                        sniffer.metrics[:deletes].delete(k)
                         sniffer.metrics[:gets].delete(k)
+                        sniffer.metrics[:hits].delete(k)
                         sniffer.metrics[:calls].delete(k)
                         sniffer.metrics[:objsize].delete(k)
                         sniffer.metrics[:reqsec].delete(k)
@@ -127,9 +134,12 @@ class UI
                 end
            
                 # render each key
-                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.2f %9.2f",
+                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.d %9.d %9.2f %9.2f",
                                  display_key,
+                                 sniffer.metrics[:deletes][k],
+                                 sniffer.metrics[:sets][k],
                                  sniffer.metrics[:gets][k],
+                                 sniffer.metrics[:hits][k],
                                  sniffer.metrics[:calls][k],
                                  sniffer.metrics[:objsize][k],
                                  sniffer.metrics[:reqsec][k],
