@@ -26,7 +26,7 @@ class UI
 
         @commands = {
             'Q' => "quit",
-            'C' => "sort by deletes",
+            'D' => "sort by deletes",
             'S' => "sort by sets",
             'G' => "sort by gets",
             'H' => "sort by hits",
@@ -134,12 +134,12 @@ class UI
                 end
            
                 # render each key
-                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.d %9.d %9.d %9.2f %9.2f",
+                line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.2f %% %9.d %9.d %9.2f %9.2f",
                                  display_key,
                                  sniffer.metrics[:deletes][k],
                                  sniffer.metrics[:sets][k],
                                  sniffer.metrics[:gets][k],
-                                 sniffer.metrics[:hits][k],
+                                 sniffer.metrics[:hits][k] ? (sniffer.metrics[:hits][k] * 100 / sniffer.metrics[:gets][k]) : 0,
                                  sniffer.metrics[:calls][k],
                                  sniffer.metrics[:objsize][k],
                                  sniffer.metrics[:reqsec][k],
