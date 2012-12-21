@@ -71,7 +71,7 @@ class MemcacheSniffer
 
 
 	   # parse key name and size
-            if packet.raw_data =~ /^set (\S+) (\S+) (\S+) (\S+)/
+            if packet.raw_data =~ /set (\S+) (\S+) (\S+) (\S+)/
                 key   = $1
 		bytes = $4;
                 @semaphore.synchronize do
