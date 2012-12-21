@@ -46,6 +46,14 @@ until done do
             done = true
         when /[Cc]/
             sort_mode = :calls
+        when /[Ee]/
+            if @config[:detailed_calls]
+                sort_mode = :server_calls
+            end
+        when /[Ll]/
+            if @config[:detailed_calls]
+                sort_mode = :client_calls
+            end
         when /[Ss]/
             sort_mode = :objsize
         when /[Rr]/
