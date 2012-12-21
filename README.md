@@ -20,6 +20,10 @@ mctop sniffs network traffic collecting memcache `VALUE` responses and calculate
 traffic statistics for each key seen.  It currently reports on the following metrics per key:
 
 * **calls** - the number of times the key has been called since mctop started
+* **gets** - the number of times on get on that key since mctop started
+* **sets** - the number of times on set on that key since mctop started
+* **deletes** - the number of times on delete on that key since mctop started
+* **hits** - the number of times the key was hit since mctop started
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
 * **bw (kbps)** - the estimated netowrk bandwidth consumed by this key in kilobits-per-second
