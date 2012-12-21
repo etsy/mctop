@@ -49,7 +49,11 @@ the quickest way to get it running is to:
 The following key commands are available in the console UI:
 
 * `C` - sort by number of calls
-* `S` - sort by object size
+* `G` - sort by number of gets 
+* `H` - sort by number get hit rate 
+* `S` - sort by number of sets
+* `D` - sort by number of delete 
+* `O` - sort by object size
 * `R` - sort by requests/sec
 * `B` - sort by bandwidth
 * `T` - toggle sorting by ascending / descending order
