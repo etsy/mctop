@@ -2,56 +2,56 @@ require 'pcap'
 require 'thread'
 
 class MemcacheSniffer
-    attr_accessor :metrics, :semaphore
+  attr_accessor :metrics, :semaphore
 
-    def initialize(config)
-        @source    = config[:nic]
-        @port      = config[:port]
+  def initialize(config)
+    @source  = config[:nic]
+    @port    = config[:port]
 
-        @metrics = {}
-        @metrics[:calls]   = {}
-        @metrics[:objsize] = {}
-        @metrics[:reqsec]  = {}
-        @metrics[:bw]      = {}
-        @metrics[:stats]   = { :recv => 0, :drop => 0 }
+    @metrics = {}
+    @metrics[:calls]   = {}
+    @metrics[:objsize] = {}
+    @metrics[:reqsec]  = {}
+    @metrics[:bw]    = {}
+    @metrics[:stats]   = { :recv => 0, :drop => 0 }
 
-        @semaphore = Mutex.new
-    end
+    @semaphore = Mutex.new
+  end
 
-    def start
-        cap = Pcap::Capture.open_live(@source, 1500)
+  def start
+    cap = Pcap::Capture.open_live(@source, 1500)
 
-        @metrics[:start_time] = Time.new.to_f
+    @metrics[:start_time] = Time.new.to_f
 
-        @done      = false
+    @done    = false
 
-        cap.setfilter("port #{@port}")
-        cap.loop do |packet|
-            @metrics[:stats] = cap.stats
+    cap.setfilter("port #{@port}")
+    cap.loop do |packet|
+      @metrics[:stats] = cap.stats
 
-            # parse key name, and size from VALUE responses
-            if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
-                key   = $1
-                bytes = $2
+      # parse key name, and size from VALUE responses
+      if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
+        key   = $1
+        bytes = $2
 
-                @semaphore.synchronize do
-                    if @metrics[:calls].has_key?(key)
-                        @metrics[:calls][key] += 1
-                    else
-                        @metrics[:calls][key] = 1
-                    end
+        @semaphore.synchronize do
+          if @metrics[:calls].has_key?(key)
+            @metrics[:calls][key] += 1
+          else
+            @metrics[:calls][key] = 1
+          end
 
-                    @metrics[:objsize][key] = bytes.to_i
-                end
-            end
-
-            break if @done
+          @metrics[:objsize][key] = bytes.to_i
         end
+      end
 
-        cap.close
+      break if @done
     end
 
-    def done
-        @done = true
-    end
+    cap.close
+  end
+
+  def done
+    @done = true
+  end
 end
