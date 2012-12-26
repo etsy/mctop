@@ -139,7 +139,7 @@ class UI
                                  sniffer.metrics[:deletes][k],
                                  sniffer.metrics[:sets][k],
                                  sniffer.metrics[:gets][k],
-                                 sniffer.metrics[:hits][k] ? (sniffer.metrics[:hits][k] * 100 / sniffer.metrics[:gets][k]) : 0,
+                                 sniffer.metrics[:gets][k]  > 0 ? (sniffer.metrics[:hits][k] * 100 / sniffer.metrics[:gets][k]) : 0,
                                  sniffer.metrics[:calls][k],
                                  sniffer.metrics[:objsize][k],
                                  sniffer.metrics[:reqsec][k],

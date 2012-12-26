@@ -81,3 +81,7 @@ The following details are displayed in the status bar
 ### ruby-pcap drops packets at high volume
 from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet
 
+### parsing of get/set/delete to be improved 
+
+### does not support the full memcache protocol (multi gets, incr, ...) 
+
