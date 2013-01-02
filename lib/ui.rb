@@ -4,7 +4,7 @@ include Curses
 
 class UI
   def initialize(config)
-	  @config = config
+    @config = config
 
     init_screen
     cbreak
@@ -21,7 +21,7 @@ class UI
     end
 
     @stat_cols    = %w[ calls objsize req/sec bw(kbps) ]
-    @stat_col_width = 10 
+    @stat_col_width = 10
     @key_col_width  = 0
 
     @commands = {
@@ -70,10 +70,10 @@ class UI
     # construct and render footer stats line
     setpos(lines-2,0)
     attrset(color_pair(2))
-    header_summary = sprintf "%-28s %-14s %-30s", 
+    header_summary = sprintf "%-28s %-14s %-30s",
       "sort mode: #{sort_mode.to_s} (#{sort_order.to_s})",
       "keys: #{sniffer.metrics[:calls].keys.count}",
-      "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss}%)" 
+      "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss}%)"
     addstr(sprintf "%-#{cols}s", header_summary)
 
     # reset colours for main key display
@@ -81,8 +81,8 @@ class UI
 
     top = []
 
-    sniffer.semaphore.synchronize do 
-      # we may have seen no packets received on the sniffer thread 
+    sniffer.semaphore.synchronize do
+      # we may have seen no packets received on the sniffer thread
       return if sniffer.metrics[:start_time].nil?
 
       elapsed = Time.now.to_f - sniffer.metrics[:start_time]
@@ -124,7 +124,7 @@ class UI
         else
           display_key = k
         end
-       
+
         # render each key
         line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.2f %9.2f",
                  display_key,
@@ -153,7 +153,7 @@ class UI
     # Curses.getch has a bug in 1.8.x causing non-blocking
     # calls to block reimplemented using IO.select
     if RUBY_VERSION =~ /^1.8/
-	   refresh_secs = @config[:refresh_rate].to_f / 1000 
+	   refresh_secs = @config[:refresh_rate].to_f / 1000
 
       if IO.select([STDIN], nil, nil, refresh_secs)
         c = getch
