@@ -92,7 +92,7 @@ class MemcacheSniffer
           data = packet.raw_data[header_start..-1]
           header = parse_header(data)
           # See that we found the right part of the packet for the header.
-          if header[:opcode] && header[:opcode] <= 34
+          if header[:opcode] && header[:opcode] <= 0x22
             puts data.unpack('H*').inspect, header.inspect if $dump
             response = parse_binary(header, data)
             puts response.inspect if $dump
