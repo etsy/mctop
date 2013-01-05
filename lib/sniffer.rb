@@ -9,6 +9,7 @@ class MemcacheSniffer
   def initialize(config)
     @source  = config[:nic]
     @port    = config[:port]
+    @binary  = config[:binary]
 
     @metrics = {}
     @metrics[:calls]   = {}
@@ -31,11 +32,15 @@ class MemcacheSniffer
     cap.loop do |packet|
       @metrics[:stats] = cap.stats
 
-      if @config[:binary]
-        response = parse_binary(packet.raw_data)
-        # Response
-        if response[:magic] == 0x81
-          metric(response[:key], response[:bodylen])
+      if @binary
+        # Assume the header starts at the first 0x81 we see.
+        header_start = (packet.raw_data.force_encoding("BINARY") =~ Regexp.new("\x81", nil, 'n'))
+        if header_start
+          response = parse_binary(packet.raw_data[header_start..-1])
+          # See that we parsed it correctly.
+          if response[:magic] == 0x81 && response[:opcode] <= 26 && response[:datatype] == 0
+            metric(response[:key], response[:bodylen])
+          end
         end
       else
         # parse key name, and size from VALUE responses
@@ -66,25 +71,23 @@ class MemcacheSniffer
   end
 
   def parse_binary(data)
-    response = {}
-    index = 0
-    header = Hash[FIELDS.zip(data[0..23].unpack(HEADER))]
+    response = Hash[FIELDS.zip(data[0..23].unpack(HEADER))]
     index = 24
-    if header[:extlen] != 0
-      response[:extras] = data[index..(index + header[:extlen])]
-      index += header[:extlen]
+    if response[:extlen] != 0
+      response[:extras] = data[index..(index + response[:extlen])]
+      index += response[:extlen]
     end
 
-    if header[:keylen] != 0
-      response[:key] = data[index..(index + header[:keylen])]
-      index += header[:keylen]
+    if response[:keylen] != 0
+      response[:key] = data[index..(index + response[:keylen])]
+      index += response[:keylen]
     end
 
-    if header[:bodylen] != 0
-      response[:body] = data[index..(index + header[:bodylen])]
-      index += header[:bodylen]
+    if response[:bodylen] != 0
+      response[:body] = data[index..(index + response[:bodylen])]
+      index += response[:bodylen]
     end
-    
+
     response
   end
 
