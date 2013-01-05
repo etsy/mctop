@@ -6,6 +6,10 @@ class CmdLine
     @config = {}
 
     opts = OptionParser.new do |opt|
+      opt.on('-b', '--binary', 'Binary protocol (default plaintext)') do |binary|
+        @config[:binary] = true
+      end
+      
       opt.on('-i', '--interface=NIC', 'Network interface to sniff (required)') do |nic|
         @config[:nic] = nic
       end
