@@ -12,7 +12,7 @@ mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if yo
 this installed you'll need to ensure you have the development pcap libraries (libpcap-devel
 package on most linux distros) to build the native gem.
 
-![](http://etsycodeascraft.files.wordpress.com/2012/12/mctop.jpg)
+[[screen.png]]
 
 ## How it works
 
@@ -27,6 +27,7 @@ traffic statistics for each key seen.  It currently reports on the following met
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
 * **bw (kbps)** - the estimated network bandwidth consumed by this key in kilobits-per-second
+* **lifetime** - expiration time of the key at the time it was set 
 
 ## Getting it running
 
@@ -54,6 +55,7 @@ The following key commands are available in the console UI:
 
 * `C` - sort by number of calls
 * `G` - sort by number of gets 
+* `L` - sort by lifetime 
 * `H` - sort by number get hit rate 
 * `S` - sort by number of sets
 * `D` - sort by number of delete 
@@ -80,8 +82,6 @@ The following details are displayed in the status bar
 
 ### ruby-pcap drops packets at high volume
 from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet
-
-### parsing of get/set/delete to be improved 
 
 ### does not support the full memcache protocol (multi gets, incr, ...) 
 
