@@ -12,7 +12,7 @@ mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if yo
 this installed you'll need to ensure you have the development pcap libraries (libpcap-devel
 package on most linux distros) to build the native gem.
 
-![screen.png]
+![](https://raw.github.com/opepin/mctop/master/screen.png)
 
 ## How it works
 
