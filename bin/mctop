@@ -24,10 +24,10 @@ done       = false
 
 # trap most of the typical signals
 %w[ INT QUIT HUP KILL ].each do |sig|
-    Signal.trap(sig) do
-        puts "** Caught signal #{sig} - exiting"
-        done = true
-    end
+  Signal.trap(sig) do
+    puts "** Caught signal #{sig} - exiting"
+    done = true
+  end
 end
 
 # kick the sniffer thread off
@@ -35,38 +35,38 @@ sniff_thread = Thread.new { sniffer.start }
 
 # main loop
 until done do
-    ui.header
-    ui.footer
-    ui.render_stats(sniffer, sort_mode, sort_order)
-    refresh
+  ui.header
+  ui.footer
+  ui.render_stats(sniffer, sort_mode, sort_order)
+  refresh
 
-    key = ui.input_handler
-    case key
-        when /[Qq]/
-            done = true
-        when /[Cc]/
-            sort_mode = :calls
-        when /[Dd]/
-            sort_mode = :deletes
-        when /[Gg]/
-            sort_mode = :gets
-        when /[Ss]/
-            sort_mode = :sets
-        when /[Hh]/
-            sort_mode = :hits
-        when /[Oo]/
-            sort_mode = :objsize
-        when /[Rr]/
-            sort_mode = :reqsec
-        when /[Bb]/
-            sort_mode = :bw
-        when /[Tt]/
-            if sort_order == :desc
-                sort_order = :asc
-            else
-                sort_order = :desc
-            end
-    end
+  key = ui.input_handler
+  case key
+    when /[Qq]/
+      done = true
+    when /[Cc]/
+      sort_mode = :calls
+    when /[Dd]/
+      sort_mode = :deletes
+    when /[Gg]/
+      sort_mode = :gets
+    when /[Ss]/
+      sort_mode = :sets
+    when /[Hh]/
+      sort_mode = :hits
+    when /[Oo]/
+      sort_mode = :objsize
+    when /[Rr]/
+      sort_mode = :reqsec
+    when /[Bb]/
+      sort_mode = :bw
+    when /[Tt]/
+      if sort_order == :desc
+        sort_order = :asc
+      else
+        sort_order = :desc
+      end
+  end
 end
 
 ## cleanup
@@ -76,5 +76,5 @@ sniffer.done
 ## if sniffer thread doesn't join immediately kill it off the
 ## capture.each loop blocks if no packets have been seen
 if sniff_thread.join(0)
-    sniff_thread.kill
+  sniff_thread.kill
 end
