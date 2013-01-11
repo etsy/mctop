@@ -50,6 +50,8 @@ until done do
       sort_mode = :deletes
     when /[Gg]/
       sort_mode = :gets
+    when /[Ll]/
+      sort_mode = :lifetime
     when /[Ss]/
       sort_mode = :sets
     when /[Hh]/

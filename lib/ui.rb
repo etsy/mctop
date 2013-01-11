@@ -20,7 +20,7 @@ class UI
       init_pair(2, COLOR_WHITE, COLOR_RED)
     end
 
-    @stat_cols      = %w[ deletes sets gets hits calls objsize req/sec bw(kbps) ]
+    @stat_cols      = %w[ deletes sets gets hits calls objsize req/sec bw(kbps) lifetime ]
     @stat_col_width = 10 
     @key_col_width  = 0
 
@@ -28,6 +28,7 @@ class UI
       'Q' => "quit",
       'D' => "sort by deletes",
       'S' => "sort by sets",
+      'L' => "sort by lifetime",
       'G' => "sort by gets",
       'H' => "sort by hits",
       'C' => "sort by calls",
@@ -43,7 +44,7 @@ class UI
     @stat_cols = @stat_cols.map { |c| sprintf("%#{@stat_col_width}s", c) }
 
     # key column width is whatever is left over
-    @key_col_width = cols - (@stat_cols.length * @stat_col_width)
+    @key_col_width = cols - (@stat_cols.length * @stat_col_width) - 3
 
     attrset(color_pair(1))
     setpos(0,0)
@@ -107,12 +108,12 @@ class UI
             sniffer.metrics[:objsize].delete(k)
             sniffer.metrics[:reqsec].delete(k)
             sniffer.metrics[:bw].delete(k)
+            sniffer.metrics[:lifetime].delete(k)
         else
             sniffer.metrics[:reqsec][k]  = v / elapsed
             sniffer.metrics[:bw][k]      = ((sniffer.metrics[:objsize][k] * sniffer.metrics[:reqsec][k]) * 8) / 1000
         end
     end 
-
     top = sniffer.metrics[sort_mode].sort { |a,b| a[1] <=> b[1] }
   end
 
@@ -134,7 +135,7 @@ class UI
        end
            
        # render each key
-       line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.2f %% %9.d %9.d %9.2f %9.2f",
+       line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.2f %% %9.d %9.d %9.2f %9.2f %9.d",
                 display_key,
                 sniffer.metrics[:deletes][k],
                 sniffer.metrics[:sets][k],
@@ -143,7 +144,8 @@ class UI
                 sniffer.metrics[:calls][k],
                 sniffer.metrics[:objsize][k],
                 sniffer.metrics[:reqsec][k],
-                sniffer.metrics[:bw][k]
+                sniffer.metrics[:bw][k],
+                sniffer.metrics[:lifetime][k] 
       else
         # we're not clearing the display between renders so erase past
         # keys with blank lines if there's < maxlines of results

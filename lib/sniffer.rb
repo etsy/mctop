@@ -12,6 +12,7 @@ class MemcacheSniffer
     @metrics = {}
     @metrics[:deletes]   = {}
     @metrics[:sets]   = {}
+    @metrics[:lifetime]   = {}
     @metrics[:gets]   = {}
     @metrics[:hits]   = {}
     @metrics[:calls]   = {}
@@ -28,6 +29,7 @@ class MemcacheSniffer
     if ! @metrics[:calls].has_key?(key)
        @metrics[:calls][key] = 0
        @metrics[:sets][key] = 0
+       @metrics[:lifetime][key] = -1
        @metrics[:gets][key] = 0
        @metrics[:deletes][key] = 0
        @metrics[:hits][key] = 0
@@ -77,6 +79,7 @@ class MemcacheSniffer
       # parse key/ name and size
       if packet.raw_data =~ /set (\S+) (\S+) (\S+) (\S+)\r\n/
         key   = $1
+        ttl = $3;
         bytes = $4;
         @semaphore.synchronize do
           self.command(key)
@@ -84,6 +87,7 @@ class MemcacheSniffer
           # @log.warn(packet.raw_data)
           @metrics[:calls][key] += 1
           @metrics[:objsize][key] = bytes.to_i;
+          @metrics[:lifetime][key] = ttl.to_i;
         end
       end
 
