@@ -31,7 +31,7 @@ class MemcacheSniffer
        @metrics[:gets][key] = 0
        @metrics[:deletes][key] = 0
        @metrics[:hits][key] = 0
-       @metrics[:objsize][key] = 0
+       @metrics[:objsize][key] = -1 
     end
   end
 
