@@ -10,6 +10,7 @@ require 'rubygems'
 require 'cmdline'
 require 'sniffer'
 require 'ui'
+require 'csv'
 
 @config = CmdLine.parse(ARGV)
 
@@ -21,6 +22,7 @@ ui      = UI.new(@config)
 sort_mode  = :reqsec
 sort_order = :desc
 done       = false
+dump       = false
 
 # trap most of the typical signals
 %w[ INT QUIT HUP KILL ].each do |sig|
@@ -44,6 +46,9 @@ until done do
   case key
     when /[Qq]/
       done = true
+    when /[Dd]/
+      done = true
+      dump = true
     when /[Cc]/
       sort_mode = :calls
     when /[Ss]/
@@ -69,4 +74,13 @@ sniffer.done
 ## capture.each loop blocks if no packets have been seen
 if sniff_thread.join(0)
   sniff_thread.kill
+end
+
+if dump
+  CSV.open(@config[:dump], "w") do |csv|
+    csv << ["key","calls","objsize"]
+    sniffer.metrics[:calls].each do |k,v|
+      csv << [k,v,sniffer.metrics[:objsize][k]]
+    end
+  end
 end
