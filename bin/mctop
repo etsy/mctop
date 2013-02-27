@@ -78,7 +78,6 @@ end
 
 if dump
   CSV.open(@config[:dump], "w") do |csv|
-    csv << ["key","calls","objsize"]
     sniffer.metrics[:calls].each do |k,v|
       csv << [k,v,sniffer.metrics[:objsize][k]]
     end
