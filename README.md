@@ -40,6 +40,7 @@ the quickest way to get it running is to:
     Usage: mctop [options]
         -i, --interface=NIC              Network interface to sniff (required)
         -p, --port=PORT                  Network port to sniff on (default 11211)
+            --host=HOST                  Network host to sniff on (default all)
         -d, --discard=THRESH             Discard keys with request/sec rate below THRESH
         -r, --refresh=MS                 Refresh the stats display every MS milliseconds
         -h, --help                       Show usage info
