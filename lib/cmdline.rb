@@ -30,6 +30,11 @@ class CmdLine
         @config[:refresh_rate] = refresh_rate
       end
 
+      @config[:write] = false
+      opt.on('-w', '--writes', 'Capture write traffic') do |writes|
+        @config[:writes] = writes
+      end 
+
       opt.on_tail '-h', '--help', 'Show usage info' do
         puts opts
         exit

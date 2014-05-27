@@ -8,6 +8,7 @@ class MemcacheSniffer
     @source  = config[:nic]
     @port    = config[:port]
     @host    = config[:host]
+    @re      = config[:writes] ? /(set|add|replace) (\S+) \d+ \d+ (\d+)/ :  /VALUE (\S+) \S+ (\S+)/
 
     @metrics = {}
     @metrics[:calls]   = {}
@@ -35,10 +36,12 @@ class MemcacheSniffer
     cap.loop do |packet|
       @metrics[:stats] = cap.stats
 
-      # parse key name, and size from VALUE responses
-      if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
-        key   = $1
-        bytes = $2
+      # parse key name, and size from VALUE responses OR
+      # write requests
+      @re.match(packet.raw_data) do |md|
+        a = md.to_a.last(2)
+        key   = a[0]
+        bytes = a[1]
 
         @semaphore.synchronize do
           if @metrics[:calls].has_key?(key)
