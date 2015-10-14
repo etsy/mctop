@@ -1,3 +1,7 @@
+# mctop is an Archived Prjoect
+
+mctop is no longer actively maintained. Your mileage with patches may vary.
+
 # mctop
 
 Inspired by "top", mctop passively sniffs the network traffic passing in and out of a
