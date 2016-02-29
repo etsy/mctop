@@ -20,18 +20,23 @@ class UI
       init_pair(2, COLOR_WHITE, COLOR_RED)
     end
 
-    @stat_cols    = %w[ calls objsize req/sec bw(kbps) ]
-    @stat_col_width = 10
+    @stat_cols      = %w[ deletes sets gets hits calls objsize req/sec bw(kbps) lifetime ]
+    @stat_col_width = 10 
     @key_col_width  = 0
 
     @commands = {
       'Q' => "quit",
+      'D' => "sort by deletes",
+      'S' => "sort by sets",
+      'L' => "sort by lifetime",
+      'G' => "sort by gets",
+      'H' => "sort by hits",
       'C' => "sort by calls",
-      'S' => "sort by size",
+      'O' => "sort by size",
       'R' => "sort by req/sec",
       'B' => "sort by bandwidth",
       'T' => "toggle sort order (asc|desc)"
-    }
+     }
   end
 
   def header
@@ -39,7 +44,7 @@ class UI
     @stat_cols = @stat_cols.map { |c| sprintf("%#{@stat_col_width}s", c) }
 
     # key column width is whatever is left over
-    @key_col_width = cols - (@stat_cols.length * @stat_col_width)
+    @key_col_width = cols - (@stat_cols.length * @stat_col_width) - 3
 
     attrset(color_pair(1))
     setpos(0,0)
@@ -70,10 +75,10 @@ class UI
     # construct and render footer stats line
     setpos(lines-2,0)
     attrset(color_pair(2))
-    header_summary = sprintf "%-28s %-14s %-30s",
+    header_summary = sprintf "%-28s %-14s %-30s", 
       "sort mode: #{sort_mode.to_s} (#{sort_order.to_s})",
       "keys: #{sniffer.metrics[:calls].keys.count}",
-      "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss}%)"
+      "packets (recv/dropped): #{sniffer.metrics[:stats][:recv]} / #{sniffer.metrics[:stats][:drop]} (#{loss}%)" 
     addstr(sprintf "%-#{cols}s", header_summary)
 
     # reset colours for main key display
@@ -81,57 +86,66 @@ class UI
 
     top = []
 
-    sniffer.semaphore.synchronize do
-      # we may have seen no packets received on the sniffer thread
+    sniffer.semaphore.synchronize do 
+      # we may have seen no packets received on the sniffer thread 
       return if sniffer.metrics[:start_time].nil?
 
       elapsed = Time.now.to_f - sniffer.metrics[:start_time]
 
       # iterate over all the keys in the metrics hash and calculate some values
       sniffer.metrics[:calls].each do |k,v|
-          reqsec = v / elapsed
+         reqsec = v / elapsed
 
-          # if req/sec is <= the discard threshold delete those keys from
-          # the metrics hash - this is a hack to manage the size of the
-          # metrics hash in high volume environments
-          if reqsec <= @config[:discard_thresh]
+         # if req/sec is <= the discard threshold delete those keys from
+         # the metrics hash - this is a hack to manage the size of the
+         # metrics hash in high volume environments
+         if reqsec <= @config[:discard_thresh]
+            sniffer.metrics[:sets].delete(k)
+            sniffer.metrics[:deletes].delete(k)
+            sniffer.metrics[:gets].delete(k)
+            sniffer.metrics[:hits].delete(k)
             sniffer.metrics[:calls].delete(k)
             sniffer.metrics[:objsize].delete(k)
             sniffer.metrics[:reqsec].delete(k)
             sniffer.metrics[:bw].delete(k)
-          else
-            sniffer.metrics[:reqsec][k]  = v / elapsed
-            sniffer.metrics[:bw][k]    = ((sniffer.metrics[:objsize][k] * sniffer.metrics[:reqsec][k]) * 8) / 1000
-          end
-      end
-
-      top = sniffer.metrics[sort_mode].sort { |a,b| a[1] <=> b[1] }
-    end
-
-    unless sort_order == :asc
-      top.reverse!
-    end
-
-    for i in 0..maxlines-1
-      if i < top.length
-        k = top[i][0]
-        v = top[i][1]
-
-        # if the key is too wide for the column truncate it and add an ellipsis
-        if k.length > @key_col_width
-          display_key = k[0..@key_col_width-4]
-          display_key = "#{display_key}..."
+            sniffer.metrics[:lifetime].delete(k)
         else
-          display_key = k
+            sniffer.metrics[:reqsec][k]  = v / elapsed
+            sniffer.metrics[:bw][k]      = ((sniffer.metrics[:objsize][k] * sniffer.metrics[:reqsec][k]) * 8) / 1000
         end
+    end 
+    top = sniffer.metrics[sort_mode].sort { |a,b| a[1] <=> b[1] }
+  end
 
-        # render each key
-        line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.2f %9.2f",
-                 display_key,
-                 sniffer.metrics[:calls][k],
-                 sniffer.metrics[:objsize][k],
-                 sniffer.metrics[:reqsec][k],
-                 sniffer.metrics[:bw][k]
+  unless sort_order == :asc
+    top.reverse!
+   end
+
+   for i in 0..maxlines-1
+     if i < top.length
+       k = top[i][0]
+       v = top[i][1]
+
+       # if the key is too wide for the column truncate it and add an ellipsis
+       if k.length > @key_col_width
+         display_key = k[0..@key_col_width-4]
+         display_key = "#{display_key}..."
+       else
+         display_key = k
+       end
+           
+       # render each key
+       line = sprintf "%-#{@key_col_width}s %9.d %9.d %9.d %9.2f %% %9.d %9.d %9.2f %9.2f %9.d",
+                display_key,
+                sniffer.metrics[:deletes][k],
+                sniffer.metrics[:sets][k],
+                sniffer.metrics[:gets][k],
+                sniffer.metrics[:gets][k]  > 0 ? (sniffer.metrics[:hits][k] * 100 / sniffer.metrics[:gets][k]) : 0,
+                sniffer.metrics[:calls][k],
+                sniffer.metrics[:objsize][k],
+                sniffer.metrics[:reqsec][k],
+                sniffer.metrics[:bw][k],
+                sniffer.metrics[:lifetime][k] 
       else
         # we're not clearing the display between renders so erase past
         # keys with blank lines if there's < maxlines of results
@@ -147,6 +161,7 @@ class UI
     attrset(color_pair(2))
     setpos(lines-2, cols-18)
     addstr(sprintf "rt: %8.3f (ms)", runtime)
+
   end
 
   def input_handler

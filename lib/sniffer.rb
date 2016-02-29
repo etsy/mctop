@@ -1,8 +1,9 @@
 require 'pcap'
 require 'thread'
+#require 'logger'
 
 class MemcacheSniffer
-  attr_accessor :metrics, :semaphore
+  attr_accessor :metrics, :semaphore, :log
 
   def initialize(config)
     @source  = config[:nic]
@@ -10,13 +11,31 @@ class MemcacheSniffer
     @host    = config[:host]
 
     @metrics = {}
+    @metrics[:deletes]   = {}
+    @metrics[:sets]   = {}
+    @metrics[:lifetime]   = {}
+    @metrics[:gets]   = {}
+    @metrics[:hits]   = {}
     @metrics[:calls]   = {}
     @metrics[:objsize] = {}
     @metrics[:reqsec]  = {}
-    @metrics[:bw]    = {}
+    @metrics[:bw]      = {}
     @metrics[:stats]   = { :recv => 0, :drop => 0 }
 
     @semaphore = Mutex.new
+    #@log = Logger.new('/tmp/logfile.log')
+  end
+
+  def command(key) 
+    if ! @metrics[:calls].has_key?(key)
+       @metrics[:calls][key] = 0
+       @metrics[:sets][key] = 0
+       @metrics[:lifetime][key] = -1
+       @metrics[:gets][key] = 0
+       @metrics[:deletes][key] = 0
+       @metrics[:hits][key] = 0
+       @metrics[:objsize][key] = -1 
+    end
   end
 
   def start
@@ -35,22 +54,61 @@ class MemcacheSniffer
     cap.loop do |packet|
       @metrics[:stats] = cap.stats
 
-      # parse key name, and size from VALUE responses
+      # hit on a get parse key name, and size from VALUE responses
+      if packet.raw_data =~ /STAT /
+        next
+      end
+		
+      # hit on a get parse key name, and size from VALUE responses
       if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
-        key   = $1
-        bytes = $2
-
-        @semaphore.synchronize do
-          if @metrics[:calls].has_key?(key)
-            @metrics[:calls][key] += 1
-          else
-            @metrics[:calls][key] = 1
-          end
-
-          @metrics[:objsize][key] = bytes.to_i
+      key   = $1
+      bytes = $2
+      @semaphore.synchronize do
+        self.command(key)
+        @metrics[:hits][key] += 1
+        @metrics[:objsize][key] = bytes.to_i
         end
       end
 
+      # parse key name
+      # gets ?    
+      if packet.raw_data =~ /get (\S+)\r\n/
+        key   = $1
+        @semaphore.synchronize do
+          self.command(key)
+          @metrics[:gets][key] += 1
+          @metrics[:calls][key] += 1
+        end
+      end
+
+
+      # parse key/ name and size
+      if packet.raw_data =~ /set (\S+) (\S+) (\S+) (\S+)\r\n/
+        key   = $1
+        ttl = $3;
+        bytes = $4;
+        @semaphore.synchronize do
+          self.command(key)
+          @metrics[:sets][key] += 1
+          # @log.warn(packet.raw_data)
+          @metrics[:calls][key] += 1
+          @metrics[:objsize][key] = bytes.to_i;
+          @metrics[:lifetime][key] = ttl.to_i;
+        end
+      end
+
+
+      # parse key name
+      # delete     
+      if packet.raw_data =~ /delete (\S+)/
+        key   = $1
+        @semaphore.synchronize do
+          self.command(key)
+            @metrics[:deletes][key] += 1
+            @metrics[:calls][key] += 1
+        end
+      end
+     
       break if @done
     end
 

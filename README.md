@@ -16,7 +16,7 @@ mctop depends on the [ruby-pcap](https://rubygems.org/gems/ruby-pcap) gem, if yo
 this installed you'll need to ensure you have the development pcap libraries (libpcap-devel
 package on most linux distros) to build the native gem.
 
-![](http://etsycodeascraft.files.wordpress.com/2012/12/mctop.jpg)
+![](https://raw.github.com/opepin/mctop/master/screen.png)
 
 ## How it works
 
@@ -24,9 +24,14 @@ mctop sniffs network traffic collecting memcache `VALUE` responses and calculate
 traffic statistics for each key seen.  It currently reports on the following metrics per key:
 
 * **calls** - the number of times the key has been called since mctop started
+* **gets** - the number of times on get on that key since mctop started
+* **hits** - hit rate on get requests since mctop started
+* **sets** - the number of times on set on that key since mctop started
+* **deletes** - the number of times on delete on that key since mctop started
 * **objsize** - the size of the object stored for that key
 * **req/sec** - the number of requests per second for the key
 * **bw (kbps)** - the estimated network bandwidth consumed by this key in kilobits-per-second
+* **lifetime** - expiration time of the key at the time it was set 
 
 ## Getting it running
 
@@ -54,7 +59,12 @@ the quickest way to get it running is to:
 The following key commands are available in the console UI:
 
 * `C` - sort by number of calls
-* `S` - sort by object size
+* `G` - sort by number of gets 
+* `L` - sort by lifetime 
+* `H` - sort by number get hit rate 
+* `S` - sort by number of sets
+* `D` - sort by number of delete 
+* `O` - sort by object size
 * `R` - sort by requests/sec
 * `B` - sort by bandwidth
 * `T` - toggle sorting by ascending / descending order
@@ -77,6 +87,8 @@ The following details are displayed in the status bar
 
 ### ruby-pcap drops packets at high volume
 from my testing the ruby-pcap native interface to libpcap struggles to keep up with high packet rates (in what we see on a production memcache instance) you can keep an eye on the packets recv/drop and loss percentage on the status bar at the bottom of the UI to get an idea of the packet
+
+### does not support the full memcache protocol (multi gets, incr, ...) 
 
 ### No binary protocol support
 There is currently no support for the binary protocol. However, if someone is using it and would like to submit a patch, it would be welcome.

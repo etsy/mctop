@@ -46,7 +46,17 @@ until done do
       done = true
     when /[Cc]/
       sort_mode = :calls
+    when /[Dd]/
+      sort_mode = :deletes
+    when /[Gg]/
+      sort_mode = :gets
+    when /[Ll]/
+      sort_mode = :lifetime
     when /[Ss]/
+      sort_mode = :sets
+    when /[Hh]/
+      sort_mode = :hits
+    when /[Oo]/
       sort_mode = :objsize
     when /[Rr]/
       sort_mode = :reqsec
