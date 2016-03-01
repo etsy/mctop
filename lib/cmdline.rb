@@ -5,6 +5,8 @@ class CmdLine
   def self.parse(args)
     @config = {}
 
+    @config[:dump] = "dump.csv"
+
     opts = OptionParser.new do |opt|
       opt.on('-i', '--interface=NIC', 'Network interface to sniff (required)') do |nic|
         @config[:nic] = nic

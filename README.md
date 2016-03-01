@@ -59,6 +59,7 @@ The following key commands are available in the console UI:
 * `B` - sort by bandwidth
 * `T` - toggle sorting by ascending / descending order
 * `Q` - quits
+* `D` - quits and dumps keys to dump.csv file
 
 ## Status bar
 

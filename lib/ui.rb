@@ -30,7 +30,8 @@ class UI
       'S' => "sort by size",
       'R' => "sort by req/sec",
       'B' => "sort by bandwidth",
-      'T' => "toggle sort order (asc|desc)"
+      'T' => "toggle sort order (asc|desc)",
+      'D' => "dump"
     }
   end
 
