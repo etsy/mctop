@@ -23,12 +23,12 @@ sort_order = :desc
 done       = false
 
 # trap most of the typical signals
-%w[ INT QUIT HUP KILL ].each do |sig|
-  Signal.trap(sig) do
-    puts "** Caught signal #{sig} - exiting"
-    done = true
-  end
-end
+#%w[ INT QUIT HUP KILL ].each do |sig|
+#  Signal.trap(sig) do
+#    puts "** Caught signal #{sig} - exiting"
+#    done = true
+#  end
+#end
 
 # kick the sniffer thread off
 sniff_thread = Thread.new { sniffer.start }

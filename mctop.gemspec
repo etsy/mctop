@@ -15,6 +15,6 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
 
-  gem.add_runtime_dependency 'ruby-pcap', '= 0.7.8'
+  gem.add_runtime_dependency 'ruby-pcap', '= 0.7.9'
   gem.add_runtime_dependency 'curses', '~> 1.0.1'
 end
